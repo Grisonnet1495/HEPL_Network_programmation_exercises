@@ -105,11 +105,13 @@ void AfficheEnteteVehiculeHV()
   sprintf(Tampon, "%s", "Ref");
   MonPrintf(Tampon, 4, strlen(Tampon));
   sprintf(Tampon, "%s", "Constructeur");
-  MonPrintf(Tampon, 30, strlen(Tampon));
+  MonPrintf(Tampon, 20, strlen(Tampon));
   sprintf(Tampon, "%s", "Modele");
-  MonPrintf(Tampon, 30, strlen(Tampon));
+  MonPrintf(Tampon, 20, strlen(Tampon));
   sprintf(Tampon, "%s", "Quantite");
-  MonPrintf(Tampon, 6, strlen(Tampon));
+  MonPrintf(Tampon, 15, strlen(Tampon));
+  sprintf(Tampon, "%s", "Cylindree");
+  MonPrintf(Tampon, 15, strlen(Tampon));
   printf("\n");
 }
 
@@ -119,27 +121,32 @@ void AfficheVehiculeHV(struct VehiculeHV *UnRecord)
   sprintf(Tampon, "%d", UnRecord->Reference);
   MonPrintf(Tampon, 4, strlen(Tampon));
   sprintf(Tampon, "%s", UnRecord->Constructeur);
-  MonPrintf(Tampon, 30, strlen(Tampon));
+  MonPrintf(Tampon, 20, strlen(Tampon));
   sprintf(Tampon, "%s", UnRecord->Modele);
-  MonPrintf(Tampon, 30, strlen(Tampon));
+  MonPrintf(Tampon, 20, strlen(Tampon));
   sprintf(Tampon, "%d", UnRecord->Quantite);
-  MonPrintf(Tampon, 6, strlen(Tampon));
+  MonPrintf(Tampon, 15, strlen(Tampon));
+  sprintf(Tampon, "%.1f", UnRecord->Cylindree);
+  MonPrintf(Tampon, 15, strlen(Tampon));
   printf("\n");
 }
 
-void SaiSieVehiculeHV(int Reference, struct VehiculeHV *UnRecord)
+void SaisieVehiculeHV(int Reference, struct VehiculeHV *UnRecord)
 {
   char Tampon[80];
 
   printf("Reference :%d \n", Reference);
   UnRecord->Reference = Reference;
   printf("Saisie Constructeur :");
-  fgets(UnRecord->Constructeur, sizeof UnRecord->Constructeur, stdin);
+  fgets(UnRecord->Constructeur, sizeof(UnRecord->Constructeur), stdin);
   printf("Saisie Modele :");
-  fgets(UnRecord->Modele, sizeof UnRecord->Modele, stdin);
+  fgets(UnRecord->Modele, sizeof(UnRecord->Modele), stdin);
   printf("Saisie Quantite :");
-  fgets(Tampon, sizeof Tampon, stdin);
+  fgets(Tampon, sizeof(Tampon), stdin);
   UnRecord->Quantite = atoi(Tampon);
+  printf("Saisie Cylindree :");
+  fgets(Tampon, sizeof(Tampon), stdin);
+  UnRecord->Cylindree = atof(Tampon);
 
   DelNewLine(UnRecord->Constructeur);
   DelNewLine(UnRecord->Modele);
@@ -211,8 +218,7 @@ void ListingVehiculesHV(char *NomFichier)
 {
   struct VehiculeHV UnRecord;
   char Tampon[80];
-  int bytesRead;
-  int fd;
+  int fd, bytesRead, i = 1;
 
   fd = open(NomFichier, O_RDONLY);
   if (fd == -1)
@@ -221,17 +227,21 @@ void ListingVehiculesHV(char *NomFichier)
     exit(0);
   }
   else
+  {
     fprintf(stderr, "Ouverture reussie \n");
+  }
 
   AfficheEnteteVehiculeHV();
   bytesRead = read(fd, &UnRecord, sizeof(UnRecord));
 
   while (bytesRead)
   {
-    fprintf(stderr, "Record lu %d Bytes \n", bytesRead);
+    fprintf(stderr, "Record lu %d (%d Bytes) et Position actuelle dans le fichier %d\n", i, bytesRead, lseek(fd, 0, SEEK_CUR));
     AfficheVehiculeHV(&UnRecord);
     bytesRead = read(fd, &UnRecord, sizeof(UnRecord));
+    i++;
   }
+
   close(fd);
 }
 
@@ -263,6 +273,26 @@ void ListingFacturesHV(char *NomFichier)
     bytesRead = read(fd, &UneFacture, sizeof(struct FactureHV));
   }
   close(fd);
+}
+
+void askResearchVehiculesHV(char *NomFichier)
+{
+  char Tampon[80];
+  int Reference;
+  struct VehiculeHV UnRecord;
+
+  printf("Entrez la reference a rechercher : ");
+  fgets(Tampon, sizeof(Tampon), stdin);
+  Reference = atoi(Tampon);
+  if (RechercheHV(NomFichier, Reference, &UnRecord) == -1)
+  {
+    fprintf(stderr, "Reference non trouvee\n");
+  }
+  else
+  {
+    AfficheEnteteVehiculeHV();
+    AfficheVehiculeHV(&UnRecord);
+  }
 }
 
 int main()
@@ -299,7 +329,7 @@ int main()
       {
         int Nombre;
         Nombre = NombreVehiculesHV("VehiculesHV");
-        SaiSieVehiculeHV(Nombre + 1, &UnRecord);
+        SaisieVehiculeHV(Nombre + 1, &UnRecord);
         CreationAjoutVehiculeHV("VehiculesHV", &UnRecord);
         printf("Encoder un autre (Y/N) ?)");
         printf(">>");
@@ -313,12 +343,13 @@ int main()
       ListingVehiculesHV("VehiculesHV");
       break;
     case '4':
+      askResearchVehiculesHV("VehiculesHV");
       break;
     case '6':
       ListingFacturesHV("FactureHV");
       break;
     case '7':
-      AProposServeurHV("V1", "Tom", "Krieger");
+      AProposServeurHV("V 1", "Tom", "Krieger");
       break;
 
     case '8':

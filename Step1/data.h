@@ -13,7 +13,7 @@ struct VehiculeHV
 	char Constructeur[30];
 	char Modele[30];
 	int Quantite;
-	int Cylindree;
+	float Cylindree;
 };
 
 struct FactureHV
