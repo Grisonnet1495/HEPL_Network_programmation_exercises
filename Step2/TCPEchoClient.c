@@ -4,6 +4,7 @@
 #include <stdlib.h>     /* for atoi() and exit() */
 #include <string.h>     /* for memset() */
 #include <unistd.h>     /* for close() */
+#include "Requete.h"
 
 #define RCVBUFSIZE 32   /* Size of receive buffer */
 
@@ -19,26 +20,31 @@ int main(int argc, char *argv[])
     struct sockaddr_in echoServAddr; /* Echo server address */
     unsigned short echoServPort;     /* Echo server port */
     char *servIP;                    /* Server IP address (dotted quad) */
-    char *echoString;                /* String to send to echo server */
     char echoBuffer[RCVBUFSIZE];     /* Buffer for echo string */
     unsigned int echoStringLen;      /* Length of string to echo */
     int bytesRcvd, totalBytesRcvd;   /* Bytes read in single recv() 
                                         and total bytes read */
+    char bufferString[80];
+    struct Requete ARequest;
 
-    if ((argc < 4) || (argc > 4))    /* Test for correct number of arguments */
+    if (argc != 3) /* Test for correct number of arguments */
     {
-       fprintf(stderr, "Usage: %s <Server IP> <Echo Port>] <Echo Word> \n",
-               argv[0]);
-       exit(1);
+        fprintf(stderr, "Usage: %s <Server IP> <Echo Port>\n",
+                argv[0]);
+        exit(1);
     }
 
+    /* Set variables */
     servIP = argv[1];             /* First arg: server IP address (dotted quad) */
-    echoServPort = atoi(argv[2]);   /* Second arg: server Port */
-    echoString = argv[3];         /* Third arg: string to echo */
+    echoServPort = atoi(argv[2]); /* Second arg: server Port */
+
+    printf("Entrez un le numero de reference : ");
+    fgets(bufferString, sizeof(bufferString), stdin);
+    ARequest.Reference = atoi(bufferString);
 
     /* Create a reliable, stream socket using TCP */
     if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
-        DieWithError("socket() failed");
+        DieWithError("socket() failed\n");
 
     /* Construct the server address structure */
     memset(&echoServAddr, 0, sizeof(echoServAddr));     /* Zero out structure */
@@ -48,29 +54,24 @@ int main(int argc, char *argv[])
 
     /* Establish the connection to the echo server */
     if (connect(sock, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr)) < 0)
-        DieWithError("connect() failed");
+        DieWithError("(Error) connect() failed\n");
 
-    echoStringLen = strlen(echoString);          /* Determine input length */
+    /* Send the structure to the server */
+    if (send(sock, &ARequest, sizeof(struct Requete), 0) != sizeof(struct Requete))
+        DieWithError("(Error) send() sent a different number of bytes than expected\n");
 
-    /* Send the string to the server */
-    if (send(sock, echoString, echoStringLen, 0) != echoStringLen)
-        DieWithError("send() sent a different number of bytes than expected");
-
-    /* Receive the same string back from the server */
+    /* Receive the same structure back from the server */
     totalBytesRcvd = 0;
-    printf("Received: ");                /* Setup to print the echoed string */
-    while (totalBytesRcvd < echoStringLen)
+    printf("The following packet has been received : "); /* Setup to print the echoed string */
+    while (totalBytesRcvd < sizeof(struct Requete))
     {
-        /* Receive up to the buffer size (minus 1 to leave space for
-           a null terminator) bytes from the sender */
-        if ((bytesRcvd = recv(sock, echoBuffer, RCVBUFSIZE - 1, 0)) <= 0)
-            DieWithError("recv() failed or connection closed prematurely");
+        if ((bytesRcvd = recv(sock, &ARequest, sizeof(struct Requete), 0)) <= 0)
+            DieWithError("(Error) recv() failed or connection closed prematurely\n");
         totalBytesRcvd += bytesRcvd;   /* Keep tally of total bytes */
-        echoBuffer[bytesRcvd] = '\0';  /* Terminate the string! */
-        printf("%s", echoBuffer);      /* Print the echo buffer */
+        AfficherRequete(stderr, ARequest);
     }
 
-    printf("\n");    /* Print a final linefeed */
+    printf("\n"); /* Print a final linefeed */
 
     close(sock);
     exit(0);

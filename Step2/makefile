@@ -1,15 +1,17 @@
 
-# cphex\makefile
+all:	admin TCPEchoClient TCPEchoServer
 
-LIBS=
-all:	admin	LibSerHV.o
+admin:	admin.c	data.h	LibSerHV.o
+	gcc -o admin admin.c LibSerHV.o 
 
+TCPEchoClient:	TCPEchoClient.c Requete.h
+	gcc -o TCPEchoClient TCPEchoClient.c
 
-LibSerHV.o:	LibSerHV.c	LibSerHV.h	data.h	
-	echo "compilation de LibSerHV"
-	gcc -c LibSerHV.c
+TCPEchoServer:	TCPEchoServer.c HandleTCPClient.o LibSerHV.h
+	gcc -o TCPEchoServer TCPEchoServer.c
 
-admin:	data.h	admin.c	LibSerHV.o			
-	echo "Compilation de admin"
-	gcc -o admin	admin.c	LibSerHV.o 
+LibSerVH.o:	LibSerHV.c LibSerHV.h data.h
+	gcc -o LibSerHV.o LibSerHV.c
 
+HandleTCPClient.o:	HandleTCPClient.c HandleTCPClient.h
+	gcc -o HandleTCPClient.o HandleTCPClient.c

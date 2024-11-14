@@ -4,10 +4,11 @@
 #include <stdlib.h>     /* for atoi() and exit() */
 #include <string.h>     /* for memset() */
 #include <unistd.h>     /* for close() */
+#include "Requete.h"
 
 #define MAXPENDING 5    /* Maximum outstanding connection requests */
 
-#include "LibSer.h"  	/* Error handling function */
+#include "LibSerHV.h"  	/* Error handling function */
 #include "HandleTCPClient.h"   /* TCP client handling function */
 
 int main(int argc, char *argv[])
@@ -18,6 +19,7 @@ int main(int argc, char *argv[])
     struct sockaddr_in echoClntAddr; /* Client address */
     unsigned short echoServPort;     /* Server port */
     unsigned int clntLen;            /* Length of client address data structure */
+    struct Requete ARequest;
 
     if (argc != 2)     /* Test for correct number of arguments */
     {
@@ -29,9 +31,9 @@ int main(int argc, char *argv[])
 
     /* Create socket for incoming connections */
     if ((servSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
-        DieWithError("socket() failed");
+        DieWithError("(Error) socket() failed\n");
     else
-       printf("socket() Ok\n") ;
+       printf("(Success) socket() Ok\n") ;
       
     /* Construct local address structure */
     memset(&echoServAddr, 0, sizeof(echoServAddr));   /* Zero out structure */
@@ -41,32 +43,32 @@ int main(int argc, char *argv[])
 
     /* Bind to the local address */
     if (bind(servSock, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr)) < 0)
-        DieWithError("bind() failed");
+        DieWithError("(Error) bind() failed\n");
     else
-       printf("bind() Ok\n") ;    
+       printf("(Success) bind() Ok\n") ;    
 
     /* Mark the socket so it will listen for incoming connections */
     if (listen(servSock, MAXPENDING) < 0)
-        DieWithError("listen() failed");
+        DieWithError("(Error) listen() failed\n");
     else
-       printf("listen() Ok\n") ;     
+       printf("(Success) listen() Ok\n") ;     
 
     for (;;) /* Run forever */
     {
         /* Set the size of the in-out parameter */
-        clntLen = sizeof(echoClntAddr);
+        clntLen = sizeof(struct Requete);
 
         /* Wait for a client to connect */
         if ((clntSock = accept(servSock, (struct sockaddr *) &echoClntAddr, 
                                &clntLen)) < 0)
-            DieWithError("accept() failed");
+            DieWithError("(Error) accept() failed\n");
         else
-           printf("accept() Ok\n") ;     
+           printf("(Success) accept() Ok\n") ;     
 
 
         /* clntSock is connected to a client! */
 
-        printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));
+        printf("Handling client...%s\n", inet_ntoa(echoClntAddr.sin_addr));
 
         HandleTCPClient(clntSock);
     }

@@ -21,7 +21,6 @@ struct Requete
   time_t Date;
   int Reference; // la référence du film
   int Quantite;
-  ;
   int Prix;
   char Constructeur[30];
   char Modele[30];
