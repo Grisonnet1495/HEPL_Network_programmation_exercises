@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
     char *servIP;                    /* Server IP address (dotted quad) */
     char *echoString;                /* String to echo */
     unsigned int echoStringLen;      /* Length of string to echo */
+    char[80] bufferString;
 
     struct Requete UneRequete;
 
@@ -35,6 +36,10 @@ int main(int argc, char *argv[])
     servIP = argv[1];             /* First arg: server IP address (dotted quad) */
     echoServPort = atoi(argv[2]); /* Second arg: server Port */
     echoString = argv[3];         /* Third arg: string to echo */
+
+    printf("Entrez un le numero de reference : ");
+    fgets(bufferString, sizeof(buffer), stdin);
+    UneRequete->Reference = atoi(bufferString);
 
     /* Create a reliable, stream socket using TCP */
     if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
@@ -63,9 +68,21 @@ int main(int argc, char *argv[])
     if ((read(sock, &UneRequete, sizeof(struct Requete))) <= 0)
         DieWithError("recv() failed or connection closed prematurely");
 
-    printf("%s", UneRequete.Chaine); /* Print the echo buffer */
-    printf("\n");                    /* Print a final linefeed */
+    DisplayRequest(&UneRequete);
 
     close(sock);
     exit(0);
+}
+
+void DisplayRequest(struct Requete *UneRequete)
+{
+  printf("> Type requete : %d\n", UneRequete.Type);
+  printf("> Numero requete : %d\n", UneRequete.NumeroFacture);
+  printf("> Numero de facture : %d\n", UneRequete.NumeroFacture);
+  printf("> Reference : %d\n", UneRequete.Reference);
+  printf("> Quantite : %d\n", UneRequete.Quantite);
+  printf("> Prix : %d\n", UneRequete.Prix);
+  printf("> Constructeur : %s\n", UneRequete.Constructeur);
+  printf("> Modele : %s\n", UneRequete.Modele);
+  printf("> Nom du client : %s\n", UneRequete.NomClient);
 }

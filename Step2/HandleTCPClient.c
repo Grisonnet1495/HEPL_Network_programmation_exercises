@@ -17,7 +17,17 @@ void HandleTCPClient(int clntSocket)
     DieWithError("recv() failed");
   while (recvMsgSize > 0)
   {
-    printf("#%s\n", UneRequete.Chaine);
+    if (RechercheHV(&UneRequete) == -1)
+    {
+      printf("La recherche a echoue.\n")
+      UneRequete.Type = TypeRequete.Fail;
+    }
+    else
+    {
+      printf("Recherche de la reference %d trouvee : ", UneRequete.Reference);
+      DisplayRequest(&UneRequete);
+    }
+
     /* Echo message back to client */
     if (write(clntSocket, &UneRequete, recvMsgSize) != recvMsgSize)
       DieWithError("send() failed");
@@ -28,4 +38,17 @@ void HandleTCPClient(int clntSocket)
   }
   printf("Connexion Closed\n");
   close(clntSocket); /* Close client socket */
+}
+
+void DisplayRequest(struct Requete *UneRequete)
+{
+  printf("> Type requete : %d\n", UneRequete.Type);
+  printf("> Numero requete : %d\n", UneRequete.NumeroFacture);
+  printf("> Numero de facture : %d\n", UneRequete.NumeroFacture);
+  printf("> Reference : %d\n", UneRequete.Reference);
+  printf("> Quantite : %d\n", UneRequete.Quantite);
+  printf("> Prix : %d\n", UneRequete.Prix);
+  printf("> Constructeur : %s\n", UneRequete.Constructeur);
+  printf("> Modele : %s\n", UneRequete.Modele);
+  printf("> Nom du client : %s\n", UneRequete.NomClient);
 }
