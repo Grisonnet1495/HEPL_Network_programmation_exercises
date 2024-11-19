@@ -10,8 +10,8 @@ TCPEchoClient:	TCPEchoClient.c Requete.h
 TCPEchoServer:	TCPEchoServer.c HandleTCPClient.o LibSerHV.h
 	gcc -o TCPEchoServer TCPEchoServer.c
 
-LibSerVH.o:	LibSerHV.c LibSerHV.h data.h
+LibSerVH.o:	LibSerHV.c LibSerHV.h data.h Requete.h
 	gcc -o LibSerHV.o LibSerHV.c
 
-HandleTCPClient.o:	HandleTCPClient.c HandleTCPClient.h
+HandleTCPClient.o:	HandleTCPClient.c HandleTCPClient.h data.h Requete.h
 	gcc -o HandleTCPClient.o HandleTCPClient.c

@@ -1,8 +1,6 @@
-#ifdef DATAH
+#ifndef DATA_H
+#define DATA_H
 
-#else
-
-#define DATAH
 #include <time.h>
 // 2022 , interdit de modifier les champs existants
 
@@ -24,4 +22,5 @@ struct FactureHV
 	int Quantite;
 	int Reference;
 };
+
 #endif

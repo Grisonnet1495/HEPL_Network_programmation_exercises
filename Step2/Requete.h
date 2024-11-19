@@ -1,3 +1,6 @@
+#ifndef REQUETE_H
+#define REQUETE_H
+
 /*struct Requete
 {
   int Numero; // Contient le numéro de la requete
@@ -44,3 +47,5 @@ void AfficheRequete(FILE *fp, struct Requete R)
   fprintf(fp, ">Client %s \n\n", R.NomClient);
   return;
 }
+
+#endif

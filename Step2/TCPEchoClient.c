@@ -5,14 +5,9 @@
 #include <string.h>     /* for memset() */
 #include <unistd.h>     /* for close() */
 #include "Requete.h"
+#include "data.h"
 
 #define RCVBUFSIZE 32   /* Size of receive buffer */
-
-void DieWithError(char *errorMessage)
-{
-    perror(errorMessage);
-    exit(1);
-}
 
 int main(int argc, char *argv[])
 {
@@ -68,11 +63,17 @@ int main(int argc, char *argv[])
         if ((bytesRcvd = recv(sock, &ARequest, sizeof(struct Requete), 0)) <= 0)
             DieWithError("(Error) recv() failed or connection closed prematurely\n");
         totalBytesRcvd += bytesRcvd;   /* Keep tally of total bytes */
-        AfficherRequete(stderr, ARequest);
+        AfficheRequete(stderr, ARequest);
     }
 
     printf("\n"); /* Print a final linefeed */
 
     close(sock);
     exit(0);
+}
+
+void DieWithError(char *errorMessage)
+{
+    perror(errorMessage);
+    exit(1);
 }

@@ -1,4 +1,12 @@
 #include "LibSerHV.h"
+#include "data.h"
+#include "Requete.h"
+
+void DieWithError(char *errorMessage)
+{
+    perror(errorMessage);
+    exit(1);
+}
 
 void AProposServeurHV(char *Version, char *Nom1, char *Nom2)
 {
