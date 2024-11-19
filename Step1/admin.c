@@ -349,7 +349,7 @@ int main()
       ListingFacturesHV("FactureHV");
       break;
     case '7':
-      AProposServeurHV("V 1", "Tom", "Krieger");
+      AProposServeurHV("V 1", "Tom Krieger", "Waxime Wegimont");
       break;
 
     case '8':
