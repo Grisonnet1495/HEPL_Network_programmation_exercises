@@ -4,6 +4,7 @@
 #include <stdlib.h>     /* for atoi() and exit() */
 #include <string.h>     /* for memset() */
 #include <unistd.h>     /* for close() */
+#include "LibSerHV.h"
 #include "Requete.h"
 #include "data.h"
 
@@ -24,7 +25,7 @@ int main(int argc, char *argv[])
 
     if (argc != 3) /* Test for correct number of arguments */
     {
-        fprintf(stderr, "Usage: %s <Server IP> <Echo Port>\n",
+        fprintf(stderr, "Usage : %s <Server IP> <Echo Port>\n",
                 argv[0]);
         exit(1);
     }
@@ -39,7 +40,7 @@ int main(int argc, char *argv[])
 
     /* Create a reliable, stream socket using TCP */
     if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
-        DieWithError("socket() failed\n");
+        DieWithError("(Error) socket() failed\n");
 
     /* Construct the server address structure */
     memset(&echoServAddr, 0, sizeof(echoServAddr));     /* Zero out structure */
@@ -57,7 +58,7 @@ int main(int argc, char *argv[])
 
     /* Receive the same structure back from the server */
     totalBytesRcvd = 0;
-    printf("The following packet has been received : "); /* Setup to print the echoed string */
+    printf("(Success) The following packet has been received : "); /* Setup to print the echoed string */
     while (totalBytesRcvd < sizeof(struct Requete))
     {
         if ((bytesRcvd = recv(sock, &ARequest, sizeof(struct Requete), 0)) <= 0)

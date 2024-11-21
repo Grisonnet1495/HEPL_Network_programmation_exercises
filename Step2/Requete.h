@@ -1,11 +1,7 @@
 #ifndef REQUETE_H
 #define REQUETE_H
 
-/*struct Requete
-{
-  int Numero; // Contient le numéro de la requete
-  char Chaine[40];
-}; */
+#include <stdio.h>
 
 enum TypeRequete
 {
@@ -22,16 +18,13 @@ struct Requete
   int Numero; // Contient le numéro de la requete
   int NumeroFacture;
   time_t Date;
-  int Reference; // la référence du film
+  int Reference; // La référence du film
   int Quantite;
-  ;
   int Prix;
   char Constructeur[30];
   char Modele[30];
   char NomClient[80];
 };
-
-#include <stdio.h>
 
 void AfficheRequete(FILE *fp, struct Requete R)
 {

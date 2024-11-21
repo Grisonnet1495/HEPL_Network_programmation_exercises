@@ -1,6 +1,8 @@
 #include <stdio.h>      /* for printf() and fprintf() */
 #include <sys/socket.h> /* for recv() and send() */
 #include <unistd.h>     /* for close() */
+#include <string.h>
+#include "HandleTCPClient.h"
 #include "LibSerHV.h"
 #include "Requete.h"
 #include "data.h"
@@ -9,59 +11,76 @@
 
 void HandleTCPClient(int clntSocket)
 {
-    int recvMsgSize; /* Size of received message */
-    struct Requete ARequest;
-    struct VehiculeVH VehiculeData;
+  int recvMsgSize; /* Size of received message */
+  struct Requete ARequest;
 
-    /* Receive message from client */
-    if ((recvMsgSize = recv(clntSocket, &ARequest, sizeof(struct Requete), 0)) < 0)
-        DieWithError("(Error) recv() failed\n");
+  /* Receive message from client */
+  if ((recvMsgSize = recv(clntSocket, &ARequest, sizeof(struct Requete), 0)) < 0)
+      DieWithError("(Error) recv() failed\n");
 
-    /* Send received string and receive again until end of transmission */
-    while (recvMsgSize > 0) /* zero indicates end of transmission */
+  /* Send received string and receive again until end of transmission */
+  while (recvMsgSize > 0) /* zero indicates end of transmission */
+  {
+    printf("(Success) Packet of %d Bytes received\n", recvMsgSize);
+
+    switch (ARequest.Type)
     {
-      printf("(Success) Packet of %d Bytes received\n", recvMsgSize);
+      case 1:
+        caseQuestion(&ARequest);
+        break;
 
-      VehiculeData.Reference = ARequest.Reference;
-      printf("Searching for reference %d...\n", VehiculeData.Reference);
-      if (RechercheHV("VehiculesHV", ARequest.Reference, &VehiculeData) == -1)
-      {
-        printf("(Error) Search failed or didn't find anything\n");
-        ARequest.Type = TypeRequete.Fail;
-      }
-      else
-      {
-        printf("(Success) Reference %d found by research :\n", ARequest.Reference);
-        AfficherRequete(stderr, ARequest);
+      case 2:
+        printf("(Error) Achat requests aren't supported");
+        break;
 
-        printf("Converting the result in a packet...");
-        ARequest = ConvertVehiculeVHToRequest(VehiculeData);
-      }
+      case 3:
+        printf("(Error) Livraison requests aren't supported");
+        break;
 
-      /* Send the response message back to the client */
-      if (send(clntSocket, &ARequest, sizeof(struct Requete), 0) != sizeof(struct Requete))
-          DieWithError("(Error) send() failed\n");
-
-      /* See if there is more data to receive */
-      if ((recvMsgSize = recv(clntSocket, &ARequest, sizeof(struct Requete), 0)) < 0)
-          DieWithError("(Error) recv() failed\n");
+      default:
+        printf("(Error) This type of request isn't supported");
     }
 
-    close(clntSocket);    /* Close client socket */
+    /* Send the response message back to the client */
+    if (send(clntSocket, &ARequest, sizeof(struct Requete), 0) != sizeof(struct Requete))
+        DieWithError("(Error) send() failed\n");
+
+    /* See if there is more data to receive */
+    if ((recvMsgSize = recv(clntSocket, &ARequest, sizeof(struct Requete), 0)) < 0)
+        DieWithError("(Error) recv() failed\n");
+  }
+
+  close(clntSocket);    /* Close client socket */
 }
 
-struct Requete ConvertVehiculeVHToRequest(struct VehiculeVH Vehicule)
+void caseQuestion(struct Requete* R)
 {
-  struct Requete ARequest;
-  ARequest.Type = TypeRequete.OK;
-  ARequest.Numero = 0;
-  ARequest.NumeroFacture = 0;
-  ARequest.Reference = Vehicule.Reference;
-  ARequest.Quantite = Vehicule.Quantite;
-  ARequest.Prix = 0;
-  ARequest.Constructeur = Vehicule.Constructeur;
-  ARequest.Modele = Vehicule.Modele;
-  ARequest.Client = "Non defini";
+  struct VehiculeHV VehiculeData;
 
-  return ARequest;
+  printf("Searching for reference %d...\n", R->Reference);
+  if (RechercheHV("VehiculesHV", R->Reference, &VehiculeData) == -1)
+  {
+    printf("(Error) Search failed or didn't find anything\n");
+    R->Type = Fail;
+  }
+  else
+  {
+    printf("(Success) Reference %d found by research\n", R->Reference);
+
+    printf("Converting the result to a packet...\n");
+    ConvertVehiculeVHToRequest(R, VehiculeData);
+  }
+}
+
+void ConvertVehiculeVHToRequest(struct Requete* R, struct VehiculeHV V)
+{
+  R->Type = OK;
+  R->Numero = 0;
+  R->NumeroFacture = 0;
+  R->Reference = V.Reference;
+  R->Quantite = V.Quantite;
+  R->Prix = 0;
+  strcpy(R->Constructeur, V.Constructeur);
+  strcpy(R->Modele, V.Modele);
+  strcpy(R->NomClient, "Non defini");
 }

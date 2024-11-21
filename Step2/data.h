@@ -2,7 +2,6 @@
 #define DATA_H
 
 #include <time.h>
-// 2022 , interdit de modifier les champs existants
 
 struct VehiculeHV
 {

@@ -1,23 +1,13 @@
-/******************************************
-  Herman Vanstapel
-  2017 Basé sur Fichiers
-*******************************************/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "data.h"
-#include "LibSerHV.h"
-
-// include pour les fonctions entrees sortie
-#include <stdio.h>
-#include <stdlib.h>
 #include <termios.h>
-
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
+#include "LibSerHV.h"
+#include "data.h"
 
 static struct termios old, new;
 
@@ -304,16 +294,16 @@ int main()
   int Numero;
   while (1)
   {
-    printf("-------2022-----------\n");
-    printf("1) Ajout              \n");
-    printf("2) Vehicule           \n");
-    printf("4) Recherche          \n");
-    printf("5) Achat              \n");
-    printf("6) Factures           \n");
-    printf("7) A propos           \n");
-    printf("8) exit               \n");
-    printf("----------------------\n");
-    printf(">>");
+    printf("----------------2022----------------\n");
+    printf("1) Ajout un vehicule                \n");
+    printf("2) Afficher les vehicules           \n");
+    printf("4) Recherche un vehicule            \n");
+    printf("5) Acheter un vehicule              \n");
+    printf("6) Visualiser les factures          \n");
+    printf("7) A propos du serveur              \n");
+    printf("8) Quitter                          \n");
+    printf("------------------------------------\n");
+    printf("Entrez votre choix : ");
     Choix = GetchE();
     printf("\n");
     switch (Choix)
@@ -349,7 +339,7 @@ int main()
       ListingFacturesHV("FactureHV");
       break;
     case '7':
-      AProposServeurHV("V 1", "Tom", "Krieger");
+      AProposServeurHV("V 1", "Tom Krieger", "Maxime Wegimont");
       break;
 
     case '8':

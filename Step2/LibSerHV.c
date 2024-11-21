@@ -1,6 +1,5 @@
 #include "LibSerHV.h"
 #include "data.h"
-#include "Requete.h"
 
 void DieWithError(char *errorMessage)
 {

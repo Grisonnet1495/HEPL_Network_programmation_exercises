@@ -8,11 +8,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "data.h"
-#include "Requete.h"
 
 void DieWithError(char *errorMessage) ;
 void AProposServeurHV(char *Version,char *Nom1,char* Nom2) ;
 int RechercheHV(char* NomFichier, int Reference, struct VehiculeHV *UnRecord);
-struct Requete ConvertVehiculeVHToRequest(struct VehiculeVH Vehicule);
 
 #endif
