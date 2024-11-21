@@ -17,16 +17,30 @@ void DieWithError(char *errorMessage)
 
 void AfficheRequete(FILE *fp, struct Requete R)
 {
-  fprintf(fp, ">TypeRequete %d \n", R.Type);
-  fprintf(fp, ">Numero %d \n", R.Numero);
-  fprintf(fp, ">NumeroFacture %d \n", R.NumeroFacture);
-  fprintf(fp, ">Date %ld \n", R.Date);
-  fprintf(fp, ">Reference %d \n", R.Reference);
-  fprintf(fp, ">Quantite %d \n", R.Quantite);
-  fprintf(fp, ">Prix %d \n", R.Prix);
-  fprintf(fp, ">Constructeur %s \n", R.Constructeur);
-  fprintf(fp, ">Modele %s \n", R.Modele);
-  fprintf(fp, ">NomClient %s \n\n", R.NomClient);
+  fprintf(fp, "> Type de requete : %d\n", R.Type);
+  fprintf(fp, "> Numero : %d\n", R.Numero);
+  fprintf(fp, "> Numero de la facture : %d\n", R.NumeroFacture);
+  fprintf(fp, "> Date : %ld\n", R.Date);
+  fprintf(fp, "> Reference : %d\n", R.Reference);
+  fprintf(fp, "> Quantite : %d\n", R.Quantite);
+  fprintf(fp, "> Prix : %d\n", R.Prix);
+  fprintf(fp, "> Constructeur : %s\n", R.Constructeur);
+  fprintf(fp, "> Modele : %s\n", R.Modele);
+  fprintf(fp, "> NomClient : %s\n", R.NomClient);
+}
+
+void HandleResponse(struct Requete R)
+{
+    if (R.Type != OK)
+    {
+        printf("(Error) The server sent a negative response.\n");
+        printf("Either your request wasn't correct, or the server failed.\n");
+    }
+    else
+    {
+        fprintf(stderr, "(Success) The following packet has been received : \n");
+        AfficheRequete(stderr, R);
+    }
 }
 
 int main(int argc, char *argv[])
@@ -35,7 +49,7 @@ int main(int argc, char *argv[])
     struct sockaddr_in echoServAddr; /* Echo server address */
     unsigned short echoServPort;     /* Echo server port */
     char *servIP;                    /* Server IP address (dotted quad) */
-    int bytesRcvd, totalBytesRcvd;   /* Bytes read in single recv() 
+    int bytesSent, bytesRcvd, totalBytesRcvd;   /* Bytes read in single recv() 
                                         and total bytes read */
     char bufferString[80];
     struct Requete ARequest;
@@ -51,11 +65,6 @@ int main(int argc, char *argv[])
     servIP = argv[1];             /* First arg: server IP address (dotted quad) */
     echoServPort = atoi(argv[2]); /* Second arg: server Port */
 
-    /* Ask for the reference number */
-    printf("Entrez le numero de reference : ");
-    fgets(bufferString, sizeof(bufferString), stdin);
-    ARequest.Reference = atoi(bufferString);
-
     /* Create a reliable, stream socket using TCP */
     if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
         DieWithError("(Error) socket() failed\n");
@@ -70,20 +79,28 @@ int main(int argc, char *argv[])
     if (connect(sock, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr)) < 0)
         DieWithError("(Error) connect() failed\n");
 
+    /* Ask for the reference number */
+    printf("Entrez le numero de reference : ");
+    fgets(bufferString, sizeof(bufferString), stdin);
+    ARequest.Type = Question;
+    ARequest.Reference = atoi(bufferString);
+
     /* Send the structure to the server */
-    if (send(sock, &ARequest, sizeof(struct Requete), 0) != sizeof(struct Requete))
+    if ((bytesSent = send(sock, &ARequest, sizeof(struct Requete), 0)) != sizeof(struct Requete))
         DieWithError("(Error) send() sent a different number of bytes than expected\n");
+    fprintf(stderr, "(Success) %d Bytes sent\n", bytesSent);
 
     /* Receive the same structure back from the server */
     totalBytesRcvd = 0;
-    printf("(Success) The following packet has been received : "); /* Setup to print the echoed string */
     while (totalBytesRcvd < sizeof(struct Requete))
     {
         if ((bytesRcvd = recv(sock, &ARequest, sizeof(struct Requete), 0)) <= 0)
             DieWithError("(Error) recv() failed or connection closed prematurely\n");
-        totalBytesRcvd += bytesRcvd;   /* Keep tally of total bytes */
-        AfficheRequete(stderr, ARequest);
+        fprintf(stderr, "(Success) Packet of %d Bytes were received\n", bytesRcvd);
+        totalBytesRcvd += bytesRcvd;
     }
+
+    HandleResponse(ARequest);
 
     close(sock);
     exit(0);

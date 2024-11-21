@@ -25,15 +25,15 @@ void HandleTCPClient(int clntSocket)
 
     switch (ARequest.Type)
     {
-      case 1:
+      case Question:
         caseQuestion(&ARequest);
         break;
 
-      case 2:
+      case Achat:
         printf("(Error) Achat requests aren't supported");
         break;
 
-      case 3:
+      case Livraison:
         printf("(Error) Livraison requests aren't supported");
         break;
 
@@ -57,7 +57,7 @@ void caseQuestion(struct Requete* R)
 {
   struct VehiculeHV VehiculeData;
 
-  printf("Searching for reference %d...\n", R->Reference);
+  printf("(Process) Searching for reference %d...\n", R->Reference);
   if (RechercheHV("VehiculesHV", R->Reference, &VehiculeData) == -1)
   {
     printf("(Error) Search failed or didn't find anything\n");
@@ -67,7 +67,7 @@ void caseQuestion(struct Requete* R)
   {
     printf("(Success) Reference %d found by research\n", R->Reference);
 
-    printf("Converting the result to a packet...\n");
+    printf("(Process) Converting the result to a packet...\n");
     ConvertVehiculeVHToRequest(R, VehiculeData);
   }
 }

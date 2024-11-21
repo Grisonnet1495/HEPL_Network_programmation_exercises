@@ -26,6 +26,7 @@ int RechercheHV(char* NomFichier, int Reference, struct VehiculeHV *RetourRecord
   if (fd == -1)
   {
     fprintf(stderr, "Echec Ouverture\n");
+    fprintf(stderr, "RechercheHV<\n");
     return -1;
   }
   else

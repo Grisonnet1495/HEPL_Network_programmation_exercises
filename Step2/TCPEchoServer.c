@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     if ((servSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
         DieWithError("(Error) socket() failed\n");
     else
-       printf("(Success) socket() Ok\n") ;
+       printf("(Success) socket() OK\n") ;
       
     /* Construct local address structure */
     memset(&echoServAddr, 0, sizeof(echoServAddr));   /* Zero out structure */
@@ -43,13 +43,13 @@ int main(int argc, char *argv[])
     if (bind(servSock, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr)) < 0)
         DieWithError("(Error) bind() failed\n");
     else
-       printf("(Success) bind() Ok\n") ;    
+       printf("(Success) bind() OK\n") ;    
 
     /* Mark the socket so it will listen for incoming connections */
     if (listen(servSock, MAXPENDING) < 0)
         DieWithError("(Error) listen() failed\n");
     else
-       printf("(Success) listen() Ok\n") ;     
+       printf("(Success) listen() OK\n") ;     
 
     while(1) /* Run forever */
     {
@@ -61,11 +61,11 @@ int main(int argc, char *argv[])
                                &clntLen)) < 0)
             DieWithError("(Error) accept() failed\n");
         else
-           printf("(Success) accept() Ok\n") ;     
+           printf("(Success) accept() OK\n") ;     
 
         /* clntSock is connected to a client! */
 
-        printf("Handling client...%s\n", inet_ntoa(echoClntAddr.sin_addr));
+        printf("(Process) Handling client %s...\n", inet_ntoa(echoClntAddr.sin_addr));
 
         HandleTCPClient(clntSock);
     }
