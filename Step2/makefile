@@ -1,19 +1,23 @@
-all:	admin TCPEchoClient TCPEchoServer
+CFLAGS = -Wall -g
+OBJS = LibSerHV.o HandleTCPClient.o
 
-admin:	admin.c	data.h LibSerHV.o
-	gcc -o admin admin.c LibSerHV.o
+all: admin TCPEchoClient TCPEchoServer
 
-TCPEchoClient:	TCPEchoClient.c Requete.h LibSerHV.h data.h
-	gcc -o TCPEchoClient TCPEchoClient.c
+admin: admin.c data.h LibSerHV.o
+	gcc $(CFLAGS) -o admin admin.c LibSerHV.o
 
-TCPEchoServer:	TCPEchoServer.c HandleTCPClient.o LibSerHV.h Requete.h
-	gcc -o TCPEchoServer TCPEchoServer.c
+TCPEchoClient: TCPEchoClient.c Requete.h data.h
+	gcc $(CFLAGS) -o TCPEchoClient TCPEchoClient.c
 
-LibSerVH.o:	LibSerHV.c LibSerHV.h data.h Requete.h
-	gcc -o LibSerHV.o LibSerHV.c
+TCPEchoServer: TCPEchoServer.c HandleTCPClient.o LibSerHV.o Requete.h data.h
+	gcc $(CFLAGS) -o TCPEchoServer TCPEchoServer.c HandleTCPClient.o LibSerHV.o
 
-HandleTCPClient.o:	HandleTCPClient.c HandleTCPClient.h LibSerHV.h data.h Requete.h
-	gcc -o HandleTCPClient.o HandleTCPClient.c
+LibSerHV.o: LibSerHV.c LibSerHV.h data.h Requete.h
+	gcc $(CFLAGS) -c -o LibSerHV.o LibSerHV.c
 
+HandleTCPClient.o: HandleTCPClient.c HandleTCPClient.h LibSerHV.h data.h Requete.h
+	gcc $(CFLAGS) -c -o HandleTCPClient.o HandleTCPClient.c
+
+# Nettoyage
 clean:
-	rm -f admin TCPEchoClient TCPEchoServer LibSerHV.o HandleTCPClient.o
+	rm -f admin TCPEchoClient TCPEchoServer $(OBJS)

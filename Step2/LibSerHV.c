@@ -19,7 +19,6 @@ int RechercheHV(char* NomFichier, int Reference, struct VehiculeHV *RetourRecord
   fprintf(stderr, "RechercheHV>\n");
 
   struct VehiculeHV UnRecord;
-  char Tampon[80];
   int fd, bytesRead, i = 1;
 
   fd = open(NomFichier, O_RDONLY);
@@ -38,7 +37,7 @@ int RechercheHV(char* NomFichier, int Reference, struct VehiculeHV *RetourRecord
 
   while (bytesRead && UnRecord.Reference != Reference)
   {
-    fprintf(stderr, "Reference lue %d (%d Bytes) et Position actuelle dans le fichier %d\n", i, bytesRead, lseek(fd, 0, SEEK_CUR));
+    fprintf(stderr, "Reference lue %d (%d Bytes) et Position actuelle dans le fichier %ld\n", i, bytesRead, lseek(fd, 0, SEEK_CUR));
     bytesRead = read(fd, &UnRecord, sizeof(UnRecord));
     i++;
   }

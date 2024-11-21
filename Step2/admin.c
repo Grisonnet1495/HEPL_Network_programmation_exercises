@@ -165,10 +165,8 @@ int NombreVehiculesHV(char *NomFichier)
 
 void CreationAjoutVehiculeHV(char *NomFichier, struct VehiculeHV *UnRecord)
 {
-  char Redo;
-  int nbr;
-  int fd;
-  int taille;
+  int fd, nbr;
+  long int taille;
 
   fd = open(NomFichier, O_WRONLY | O_APPEND | O_CREAT, 0666);
   if (fd == -1)
@@ -184,7 +182,8 @@ void CreationAjoutVehiculeHV(char *NomFichier, struct VehiculeHV *UnRecord)
   UnRecord->Supprime = 0;
 
   nbr = write(fd, UnRecord, sizeof(struct VehiculeHV));
-  ;
+
+  printf("%d Bytes ecrits dans le fichier\n", nbr);
 
   close(fd);
 }
@@ -207,7 +206,6 @@ void AfficheFacture(struct FactureHV *UneFacture)
 void ListingVehiculesHV(char *NomFichier)
 {
   struct VehiculeHV UnRecord;
-  char Tampon[80];
   int fd, bytesRead, i = 1;
 
   fd = open(NomFichier, O_RDONLY);
@@ -226,7 +224,7 @@ void ListingVehiculesHV(char *NomFichier)
 
   while (bytesRead)
   {
-    fprintf(stderr, "Record lu %d (%d Bytes) et Position actuelle dans le fichier %d\n", i, bytesRead, lseek(fd, 0, SEEK_CUR));
+    fprintf(stderr, "Record lu %d (%d Bytes) et Position actuelle dans le fichier %ld\n", i, bytesRead, lseek(fd, 0, SEEK_CUR));
     AfficheVehiculeHV(&UnRecord);
     bytesRead = read(fd, &UnRecord, sizeof(UnRecord));
     i++;
@@ -238,7 +236,6 @@ void ListingVehiculesHV(char *NomFichier)
 void ListingFacturesHV(char *NomFichier)
 {
   struct FactureHV UneFacture;
-  char Tampon[80];
   int fd;
   int bytesRead;
   long pos;
@@ -288,10 +285,7 @@ void askResearchVehiculesHV(char *NomFichier)
 int main()
 {
   char Choix;
-  char Tampon[80];
-  int res;
   struct VehiculeHV UnRecord;
-  int Numero;
   while (1)
   {
     printf("----------------2022----------------\n");
@@ -310,8 +304,6 @@ int main()
     {
     case '1':
     {
-      struct VehiculeHV UnRecord;
-      FILE *sortie;
       char Redo;
 
       Redo = 'y';

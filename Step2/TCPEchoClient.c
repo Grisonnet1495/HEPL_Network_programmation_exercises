@@ -4,11 +4,30 @@
 #include <stdlib.h>     /* for atoi() and exit() */
 #include <string.h>     /* for memset() */
 #include <unistd.h>     /* for close() */
-#include "LibSerHV.h"
 #include "Requete.h"
 #include "data.h"
 
 #define RCVBUFSIZE 32   /* Size of receive buffer */
+
+void DieWithError(char *errorMessage)
+{
+    perror(errorMessage);
+    exit(1);
+}
+
+void AfficheRequete(FILE *fp, struct Requete R)
+{
+  fprintf(fp, ">TypeRequete %d \n", R.Type);
+  fprintf(fp, ">Numero %d \n", R.Numero);
+  fprintf(fp, ">NumeroFacture %d \n", R.NumeroFacture);
+  fprintf(fp, ">Date %ld \n", R.Date);
+  fprintf(fp, ">Reference %d \n", R.Reference);
+  fprintf(fp, ">Quantite %d \n", R.Quantite);
+  fprintf(fp, ">Prix %d \n", R.Prix);
+  fprintf(fp, ">Constructeur %s \n", R.Constructeur);
+  fprintf(fp, ">Modele %s \n", R.Modele);
+  fprintf(fp, ">NomClient %s \n\n", R.NomClient);
+}
 
 int main(int argc, char *argv[])
 {
@@ -16,8 +35,6 @@ int main(int argc, char *argv[])
     struct sockaddr_in echoServAddr; /* Echo server address */
     unsigned short echoServPort;     /* Echo server port */
     char *servIP;                    /* Server IP address (dotted quad) */
-    char echoBuffer[RCVBUFSIZE];     /* Buffer for echo string */
-    unsigned int echoStringLen;      /* Length of string to echo */
     int bytesRcvd, totalBytesRcvd;   /* Bytes read in single recv() 
                                         and total bytes read */
     char bufferString[80];
@@ -34,7 +51,8 @@ int main(int argc, char *argv[])
     servIP = argv[1];             /* First arg: server IP address (dotted quad) */
     echoServPort = atoi(argv[2]); /* Second arg: server Port */
 
-    printf("Entrez un le numero de reference : ");
+    /* Ask for the reference number */
+    printf("Entrez le numero de reference : ");
     fgets(bufferString, sizeof(bufferString), stdin);
     ARequest.Reference = atoi(bufferString);
 
@@ -67,14 +85,6 @@ int main(int argc, char *argv[])
         AfficheRequete(stderr, ARequest);
     }
 
-    printf("\n"); /* Print a final linefeed */
-
     close(sock);
     exit(0);
-}
-
-void DieWithError(char *errorMessage)
-{
-    perror(errorMessage);
-    exit(1);
 }

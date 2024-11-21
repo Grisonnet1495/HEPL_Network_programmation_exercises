@@ -4,12 +4,11 @@
 #include <stdlib.h>     /* for atoi() and exit() */
 #include <string.h>     /* for memset() */
 #include <unistd.h>     /* for close() */
+#include "LibSerHV.h"   /* Error handling function */
+#include "HandleTCPClient.h"   /* TCP client handling function */
 #include "Requete.h"
 
 #define MAXPENDING 5    /* Maximum outstanding connection requests */
-
-#include "LibSerHV.h"  	/* Error handling function */
-#include "HandleTCPClient.h"   /* TCP client handling function */
 
 int main(int argc, char *argv[])
 {
@@ -19,7 +18,6 @@ int main(int argc, char *argv[])
     struct sockaddr_in echoClntAddr; /* Client address */
     unsigned short echoServPort;     /* Server port */
     unsigned int clntLen;            /* Length of client address data structure */
-    struct Requete ARequest;
 
     if (argc != 2)     /* Test for correct number of arguments */
     {
@@ -53,10 +51,10 @@ int main(int argc, char *argv[])
     else
        printf("(Success) listen() Ok\n") ;     
 
-    for (;;) /* Run forever */
+    while(1) /* Run forever */
     {
         /* Set the size of the in-out parameter */
-        clntLen = sizeof(struct Requete);
+        clntLen = sizeof(echoClntAddr);
 
         /* Wait for a client to connect */
         if ((clntSock = accept(servSock, (struct sockaddr *) &echoClntAddr, 
@@ -65,12 +63,15 @@ int main(int argc, char *argv[])
         else
            printf("(Success) accept() Ok\n") ;     
 
-
         /* clntSock is connected to a client! */
 
         printf("Handling client...%s\n", inet_ntoa(echoClntAddr.sin_addr));
 
         HandleTCPClient(clntSock);
     }
-    /* NOT REACHED */
+
+    /* Not Reached */
+    
+    close(servSock);
+    return 0;
 }
