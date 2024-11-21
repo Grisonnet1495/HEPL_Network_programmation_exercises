@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
     ARequest.Reference = atoi(bufferString);
 
     /* Send the structure to the server */
-    if ((bytesSent = send(sock, &ARequest, sizeof(struct Requete), 0)) != sizeof(struct Requete))
+    if ((bytesSent = write(sock, &ARequest, sizeof(struct Requete))) != sizeof(struct Requete))
         DieWithError("(Error) send() sent a different number of bytes than expected\n");
     fprintf(stderr, "(Success) %d Bytes sent\n", bytesSent);
 
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
     totalBytesRcvd = 0;
     while (totalBytesRcvd < sizeof(struct Requete))
     {
-        if ((bytesRcvd = recv(sock, &ARequest, sizeof(struct Requete), 0)) <= 0)
+        if ((bytesRcvd = read(sock, &ARequest, sizeof(struct Requete))) <= 0)
             DieWithError("(Error) recv() failed or connection closed prematurely\n");
         fprintf(stderr, "(Success) Packet of %d Bytes were received\n", bytesRcvd);
         totalBytesRcvd += bytesRcvd;

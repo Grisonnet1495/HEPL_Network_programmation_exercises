@@ -15,7 +15,7 @@ void HandleTCPClient(int clntSocket)
   struct Requete ARequest;
 
   /* Receive message from client */
-  if ((recvMsgSize = recv(clntSocket, &ARequest, sizeof(struct Requete), 0)) < 0)
+  if ((recvMsgSize = read(clntSocket, &ARequest, sizeof(struct Requete))) < 0)
       DieWithError("(Error) recv() failed\n");
 
   /* Send received string and receive again until end of transmission */
@@ -42,11 +42,11 @@ void HandleTCPClient(int clntSocket)
     }
 
     /* Send the response message back to the client */
-    if (send(clntSocket, &ARequest, sizeof(struct Requete), 0) != sizeof(struct Requete))
+    if (write(clntSocket, &ARequest, sizeof(struct Requete)) != sizeof(struct Requete))
         DieWithError("(Error) send() failed\n");
 
     /* See if there is more data to receive */
-    if ((recvMsgSize = recv(clntSocket, &ARequest, sizeof(struct Requete), 0)) < 0)
+    if ((recvMsgSize = read(clntSocket, &ARequest, sizeof(struct Requete))) < 0)
         DieWithError("(Error) recv() failed\n");
   }
 
